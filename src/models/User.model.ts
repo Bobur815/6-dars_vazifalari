@@ -23,4 +23,7 @@ export class User extends Model{
     })
     age:number
 
+    @HasMany(() => Posts)
+    posts:Posts
+
 }

@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
+import { Module, OnModuleInit } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { User } from './models/User.model';
 import { UsersModule } from './users/users.module';
 import { PostsModule } from './posts/posts.module';
 import { Posts } from './models/Post.model';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CommentsModule } from './comments/comments.module';
+import { Comments } from './models/Comment.model';
 
 @Module({
   imports: [
@@ -20,12 +22,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         password:configService.get("DB_PASSWORD"),
         autoLoadModels:true,
         synchronize:true,
-        models:[User,Posts]
+        models:[User,Posts,Comments]
       }),
       inject:[ConfigService],
     }),
     UsersModule,
-    PostsModule
-  ]
+    PostsModule,
+    CommentsModule
+  ],
 })
-export class AppModule {}
+
+export class AppModule  {}

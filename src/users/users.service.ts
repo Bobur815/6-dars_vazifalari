@@ -1,13 +1,17 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Posts } from 'src/models/Post.model';
 import { User } from 'src/models/User.model';
+import { userDto } from './dto/users.dto';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User) private userModel: typeof User){}
 
     async getAll(){
-        let users = await this.userModel.findAll()
+        let users = await this.userModel.findAll({
+            include:[Posts]
+        })
         return users
     }
 
@@ -16,14 +20,20 @@ export class UsersService {
         return user
     }
 
-    async createUser(payload: Partial<User>){
-        let newUser = await this.userModel.create(payload)
-        return newUser
+    async createUser(payload: Required<userDto>){
+        try {
+            let newUser = await this.userModel.create(payload)
+            return newUser
+        } catch (error) {
+            if(error.name=='SequelizeUniqueConstraintError'){
+                throw new ConflictException(error.errors[0].message)
+            }
+        }
     }
 
-    async updateUser(id: string, payload: Partial<User>) {
+    async updateUser(id: string, payload: Required<userDto>) {
         let [rowsUpdated, [updatedUser]] = await this.userModel.update(payload, {
-          where: { id },
+          where: { userId: id },
           returning: true,
         });
       

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Comments } from 'src/models/Comment.model';
 import { Posts } from 'src/models/Post.model';
 
 @Injectable()
@@ -7,7 +8,9 @@ export class PostsService {
     constructor(@InjectModel(Posts) private postModel:typeof Posts){}
 
     async getAllPosts(){
-        let posts = await this.postModel.findAll()
+        let posts = await this.postModel.findAll({
+            include:[Comments]
+        })
         return posts
     }
 
@@ -23,7 +26,7 @@ export class PostsService {
 
     async updatePost(id:string, payload:Partial<Posts>){
         let [rowsUpdated, [updatedPost]] = await this.postModel.update(payload, {
-            where: { id },
+            where: { post_id: id },
             returning:true
         })
 

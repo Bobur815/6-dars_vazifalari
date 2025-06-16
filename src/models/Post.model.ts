@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
-import { Column, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { User } from "./User.model";
+import { Comments } from "./Comment.model";
 
 @Table
 export class Posts extends Model{
@@ -20,5 +22,17 @@ export class Posts extends Model{
         type: DataTypes.STRING
     })
     body:string
+
+    @ForeignKey(() => User)
+    @Column({
+        type: DataTypes.INTEGER
+    })
+    userId:number
+
+    @BelongsTo(() => User)
+    users:User
+
+    @HasMany(()=> Comments)
+    comments:Comments
 
 }
